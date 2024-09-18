@@ -1,0 +1,151 @@
+
+#########PART 1#############
+################QUESTION 2
+
+#Assigning variable to each site
+
+sitea<- c(28, 29, 31, 28, 30, 30, 30, 32, 28, 33)
+siteb<- c(23, 19, 23, 33, 32, 27, 20, 24, 42, 32)
+sitec<- c(27, 26, 28, 25, 27, 27, 30, 30, 28, 26)
+
+
+# a)
+# By calculating mean of each site and then comapring them will provide the site has 
+# the site that has the least downloads on a typical day.
+
+meanA<- mean(sitea)
+meanB<- mean(siteb)
+meanC<- mean(sitec)
+
+# As Mean of Site C is the least, the Site C has the least downloads on a typical day.
+
+# b)
+# By calculating the variance of each site, we will get to know which site has the most inconsistent usage.
+
+varA<- var(sitea)
+varB<- var(siteb)
+varC<- var(sitec)
+
+#As Variance of Site B is the highest, the Site B has the most inconsistent usage.
+
+
+###########PART 2###############
+
+###BASIC SETUP
+# Clear plots
+if(!is.null(dev.list())) dev.off()
+# Clear console
+cat("\014") 
+# Clean workspace
+rm(list=ls())
+options(scipen=9)
+
+
+# 1. Read data and converted to dataframe names 'data'
+
+data <- read.table(file = "Assign01.txt", header = TRUE, sep = ",")
+
+# 2. Append your initials to all variables in the data frame
+
+new_names <- paste0(names(data), "_kv")
+colnames(data) <- new_names
+
+#Check if initials are added or not
+colnames(data)
+
+#Change each character variable to a factor variable 
+data$Manufacturer_kv<- factor(data$Manufacturer_kv)
+data$Server_kv <- factor(data$Server_kv)
+data$DC_kv<-data$DC_kv
+#Dimensions of the dataset (rows and columns)? 
+
+dimensions <- dim(data)
+
+num_rows<- dimensions[1]
+num_cols<- dimensions[2]
+
+#######################Summarizing Data####################
+
+##################### Means and Standard Devia,ons###############
+
+# a. Calculate the mean and standard deviation for Server Message Blocks Received.
+
+data$SMBR_kv<- as.numeric(data$SMBR_kv)
+Mean_SMBR<- mean(data$SMBR_kv)
+var_SMBR<- var(data$SMBR_kv)
+sd_SMBR<- sd(data$SMBR_kv)
+
+# b. Use the results above to calculate the coefficient of variation (rounded to 3 decimal places). 
+
+cv_SMBR<- round((sd_SMBR/Mean_SMBR),3)
+
+# c. Calculate the mean and standard devia,on for Server Message Blocks Transmitted. 
+
+data$SMBT_kv<- as.numeric(data$SMBT_kv)
+mean_SMBT<- mean(data$SMBT_kv)
+var_SMBT<- var(data$SMBT_kv)
+sd_SMBT<- sd(data$SMBT_kv)
+
+# d. Also calculate the coefficient of varia,on (rounded to 3 decimal places). 
+cv_SMBT<- round((sd_SMBT/mean_SMBT),3)
+
+# e. Does the SMBT or SMBR have more variation? 
+#SMBT has more variation as CV is higher for SMBT than SMBR.
+
+
+# 2. Calculate the 45th percetile of the number of Server Message Blocks 
+# TransmiSed. This calculation should be rounded to the nearest whole number 
+# (no decimal places). 
+
+num_values <- length(data$SMBT_kv)
+Percentile_SMBT <- round((0.45*(num_values + 1)),0)
+
+
+###################ORGANZING DATA######################
+
+#############1. SUMMARY TABLE###############
+# a) Create a Summary table
+summary_table <- aggregate( data$SMBT_kv ~ data$Manufacturer_kv ,FUN = function(x) round(mean(x), 2))
+
+colnames(summary_table) <- c("Manufacturer", "Average SMBT")
+
+summary_table
+
+# b) Which Manufacturer’s Servers have, on average, transmitted the most server message blocks?
+
+# Lled is the Manufacturer who transmitted the most server message blocks.
+
+##############2. CROSS TABULATION ####################
+
+# a) Create a table counting all Servers by Data Centre. 
+
+cross_table <- table(data$Server_kv, data$DC_kv)
+
+cross_table
+
+# b) Change the table to show the percentage of each Server in each Data Centre . 
+# This should be rounded to three decimal places. 
+
+percentage_table <- round(prop.table(cross_table, margin = 2) * 100,3)
+
+percentage_table
+
+#c) What percentage of servers at Elmira are MG9696?
+
+servers_at_elmira <- percentage_table["MG9696","Elmira"]
+
+#############################3. Histogram
+
+# a) Create a histogram of Server Message Blocks Transmitted. 
+# b) The plot should be properly labelled and a unique colour and have 10 breaks. 
+
+hist(data$SMBT_kv,
+     xlab = "Server Message Blocks Transmitted",
+     ylab = "Frequency", 
+     main = "Histogram of Server Message Blocks Transmitted",
+     col = "purple",
+     breaks = 10)
+
+# c) Which range of SMBT is the most common?
+
+# The most comman range in SMBT is 50000 to 60000.
